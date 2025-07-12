@@ -3,6 +3,7 @@
 File Organization Script for macOS
 Organizes files by date into destination/YYYY/MM/ structure
 Supports both moving and copying files (preserving originals)
+Can organize by creation date (default) or modification date
 """
 
 import os
@@ -14,12 +15,13 @@ import sys
 
 
 class FileOrganizer:
-    def __init__(self, source_dir, backup_dir="backup", dry_run=False, copy_mode=False, skip_confirm=False):
+    def __init__(self, source_dir, backup_dir="backup", dry_run=False, copy_mode=False, skip_confirm=False, date_type="created"):
         self.source_dir = Path(source_dir)
         self.backup_dir = Path(backup_dir)
         self.dry_run = dry_run
         self.copy_mode = copy_mode
         self.skip_confirm = skip_confirm
+        self.date_type = date_type
         self.processed_files = 0
         self.skipped_files = 0
         
@@ -40,16 +42,21 @@ class FileOrganizer:
         }
     
     def get_file_date(self, file_path):
-        """Get the creation date of a file, fallback to modification date"""
+        """Get the file date based on user's preference (created or modified)"""
         try:
-            # Try to get creation date (birth time on macOS)
             stat = file_path.stat()
-            if hasattr(stat, 'st_birthtime'):
-                # macOS has birth time
-                timestamp = stat.st_birthtime
-            else:
-                # Fallback to modification time
+            
+            if self.date_type == "modified":
+                # Use modification date
                 timestamp = stat.st_mtime
+            else:
+                # Use creation date (default)
+                if hasattr(stat, 'st_birthtime'):
+                    # macOS has birth time (creation date)
+                    timestamp = stat.st_birthtime
+                else:
+                    # Fallback to modification time if creation date not available
+                    timestamp = stat.st_mtime
             
             return datetime.datetime.fromtimestamp(timestamp)
         except Exception as e:
@@ -93,11 +100,13 @@ class FileOrganizer:
         print("=" * 50)
         
         operation = "COPY" if self.copy_mode else "MOVE"
+        date_mode = "creation date" if self.date_type == "created" else "modification date"
         print(f"Operation: {operation}")
         print(f"Source: {self.source_dir}")
         print(f"Destination: {self.backup_dir}")
         print(f"Files to process: {file_count}")
         print(f"Total size: {format_size_func(total_size)}")
+        print(f"Date mode: Organizing by {date_mode}")
         
         if self.copy_mode:
             print(f"Mode: Copy files (originals will be preserved)")
@@ -105,7 +114,7 @@ class FileOrganizer:
             print(f"Mode: Move files (originals will be moved to destination)")
         
         print("=" * 50)
-        print("Files will be organized by creation date into: destination/YYYY/MM/")
+        print(f"Files will be organized by {date_mode} into: destination/YYYY/MM/")
         print("=" * 50)
         
         while True:
@@ -129,9 +138,11 @@ class FileOrganizer:
         
         operation = "COPY" if self.copy_mode else "MOVE"
         status = "DRY RUN" if self.dry_run else "COMPLETED"
+        date_mode = "creation date" if self.date_type == "created" else "modification date"
         
         print(f"Status: {status}")
         print(f"Operation: {operation}")
+        print(f"Date mode: Organized by {date_mode}")
         print(f"Source: {self.source_dir}")
         print(f"Destination: {self.backup_dir}")
         print("-" * 60)
@@ -216,7 +227,9 @@ class FileOrganizer:
             print(f"=== DRY RUN MODE - No files will be {operation} ===")
         
         operation_mode = "COPY" if self.copy_mode else "MOVE"
+        date_mode = "creation date" if self.date_type == "created" else "modification date"
         print(f"Operation mode: {operation_mode}")
+        print(f"Date mode: Organizing by {date_mode}")
         print(f"Scanning directory: {self.source_dir}")
         print(f"Destination directory: {self.backup_dir}")
         print(f"Supported extensions: {', '.join(sorted(self.supported_extensions))}")
@@ -307,6 +320,7 @@ def main():
     parser.add_argument("-e", "--execute", action="store_true", help="Actually process files (opposite of dry-run)")
     parser.add_argument("-c", "--copy", action="store_true", help="Copy files instead of moving them (preserves originals)")
     parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation prompt and proceed automatically")
+    parser.add_argument("--date", choices=["created", "modified"], default="created", help="Date to use for organizing files (default: created)")
     
     args = parser.parse_args()
     
@@ -322,7 +336,8 @@ def main():
         backup_dir=args.destination,
         dry_run=dry_run,
         copy_mode=args.copy,
-        skip_confirm=args.yes
+        skip_confirm=args.yes,
+        date_type=args.date
     )
     
     organizer.organize_files()
