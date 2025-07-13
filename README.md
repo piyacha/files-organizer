@@ -1,4 +1,4 @@
-# File Organizer Script for macOS
+# File Organizer Script
 
 A Python script that automatically organizes your files by date into a clean backup structure.
 
@@ -11,7 +11,6 @@ A Python script that automatically organizes your files by date into a clean bac
 - 🔄 Handles file name conflicts automatically
 - 📂 **Copy mode**: Preserves original files while organizing (use `--copy` flag)
 - ✅ **Interactive confirmation**: Shows summary and asks for confirmation before proceeding
-- 🚀 Easy to use and maintain
 
 ## Supported File Types
 
@@ -21,6 +20,26 @@ A Python script that automatically organizes your files by date into a clean bac
 - **Audio**: mp3, wav, flac, aac, ogg, wma, m4a
 - **Documents**: doc, docx, pdf, txt, rtf, pages
 
+## Installation
+
+### Quick Installation
+
+Run the automatic installer:
+
+```bash
+./install.sh
+```
+
+This will:
+- Install the command as `file-organizer`
+- Set up proper permissions
+
+After installation, you can use:
+```bash
+file-organizer --help
+file-organizer -s ~/Downloads -d ~/organized --execute
+```
+
 ## Usage
 
 ### Basic Usage
@@ -28,39 +47,10 @@ A Python script that automatically organizes your files by date into a clean bac
 **Test first (dry run mode - default):**
 ```bash
 # Using installed command
-file-organizer -s "/path/to/your/messy/folder" -d "/path/to/destination/folder"
-
-# Or using Python directly
-python3 main.py -s "/path/to/your/messy/folder" -d "/path/to/destination/folder"
-```
-
-**Actually move files:**
-```bash
-# Using installed command
 file-organizer -s "/path/to/your/messy/folder" -d "/path/to/destination/folder" --execute
 
 # Or using Python directly
 python3 main.py -s "/path/to/your/messy/folder" -d "/path/to/destination/folder" --execute
-```
-
-**Copy files (preserve originals):**
-```bash
-file-organizer -s "/path/to/your/messy/folder" -d "/path/to/destination/folder" --copy --execute
-```
-
-**Skip confirmation prompt:**
-```bash
-file-organizer -s "/path/to/your/messy/folder" -d "/path/to/destination/folder" --execute --yes
-```
-
-**Organize by modification date instead of creation date:**
-```bash
-file-organizer -s "/path/to/your/messy/folder" -d "/path/to/destination/folder" --date modified --execute
-```
-
-**Get help:**
-```bash
-file-organizer --help
 ```
 
 ### Advanced Options
@@ -84,43 +74,6 @@ file-organizer -s "/path/to/source" -d "/path/to/destination" --copy --execute
 ```bash
 file-organizer -s "/path/to/source" -d "/path/to/destination" --date modified --execute
 ```
-
-### Examples
-
-1. **Organize Downloads folder:**
-   ```bash
-   file-organizer -s ~/Downloads -d ~/OrganizedFiles --execute
-   ```
-
-2. **Test organization of Desktop:**
-   ```bash
-   file-organizer -s ~/Desktop -d ~/OrganizedDesktop
-   ```
-
-3. **Organize with custom destination folder:**
-   ```bash
-   file-organizer -s "/Volumes/External/Photos" -d "/Volumes/External/organized_photos" --execute
-   ```
-
-4. **Copy files to organize (preserve originals):**
-   ```bash
-   file-organizer -s ~/Desktop -d ~/OrganizedDesktop --copy --execute
-   ```
-
-5. **Test copy mode (dry run):**
-   ```bash
-   file-organizer -s "/Volumes/External/Photos" -d "/Volumes/External/organized_photos" --copy
-   ```
-
-6. **Organize deeply nested folders:**
-   ```bash
-   file-organizer -s "/Users/username/messy_folder_with_many_subfolders" -d "/Users/username/organized" --execute
-   ```
-
-7. **Organize by modification date (useful for edited files):**
-   ```bash
-   file-organizer -s "~/Documents/EditedPhotos" -d "~/OrganizedByEditDate" --date modified --execute
-   ```
 
 ## How Nested Folders Work
 
@@ -161,31 +114,6 @@ destination/
 │       └── archive.doc
 ```
 
-**The script finds files no matter how deeply nested they are!**
-
-## Date Organization Options
-
-The script can organize files by two different date types:
-
-### Creation Date (Default)
-- **When to use**: When you want to organize files by when they were originally created
-- **Best for**: Photos, videos, documents that haven't been edited much
-- **Example**: A photo taken on January 15, 2024 goes to `destination/2024/01/`
-
-### Modification Date
-- **When to use**: When you want to organize files by when they were last edited
-- **Best for**: Documents you've been working on, edited photos, files that have been updated
-- **Example**: A document created in 2023 but edited on March 10, 2024 goes to `destination/2024/03/`
-
-**Usage:**
-```bash
-# Organize by creation date (default)
-file-organizer -s source -d destination --execute
-
-# Organize by modification date
-file-organizer -s source -d destination --date modified --execute
-```
-
 ## Interactive Confirmation
 
 When you run the script with `--execute`, it will show you a summary and ask for confirmation:
@@ -207,11 +135,6 @@ Mode: Move files (originals will be moved to destination)
 Files will be organized by creation date into: destination/YYYY/MM/
 ==================================================
 Do you want to proceed? [y/N]: y
-```
-
-**Skip confirmation with `--yes` flag:**
-```bash
-file-organizer -s source -d dest --execute --yes
 ```
 
 ## Operation Summary
@@ -292,59 +215,6 @@ The script automatically checks disk space before starting:
    - Use move mode instead of copy (removes --copy flag)
    - Free up space on destination drive
    - Use a different destination with more space
-```
-
-**Solutions:**
-1. **Use move mode**: `python3 main.py -s source -d dest --execute` (no `--copy`)
-2. **Free up space**: Delete unnecessary files on destination drive
-3. **Different destination**: Use a drive with more space
-4. **Process in batches**: Organize smaller folders separately
-
-## Installation
-
-### Method 1: Quick Installation (Recommended)
-
-Run the automatic installer:
-
-```bash
-./install.sh
-```
-
-This will:
-- Install the command as `file-organizer`
-- Make it available system-wide
-- Set up proper permissions
-
-After installation, you can use:
-```bash
-file-organizer --help
-file-organizer -s ~/Downloads -d ~/organized --execute
-```
-
-### Method 2: Manual Installation
-
-1. **Make script executable:**
-   ```bash
-   chmod +x main.py
-   ```
-
-2. **Copy to a directory in your PATH:**
-   ```bash
-   cp main.py ~/.local/bin/file-organizer
-   chmod +x ~/.local/bin/file-organizer
-   ```
-
-3. **Add to PATH** (if not already):
-   ```bash
-   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
-   source ~/.zshrc
-   ```
-
-### Method 3: Run Without Installation
-
-You can still use the script directly:
-```bash
-python3 main.py -s source -d destination --execute
 ```
 
 ### Uninstall
